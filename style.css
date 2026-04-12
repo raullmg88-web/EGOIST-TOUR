@@ -440,8 +440,31 @@ footer {
 
 .slanted-card {
   clip-path: polygon(0 0, 100% 5%, 100% 100%, 0 95%);
-  transition: clip-path 0.3s ease;
+  transition: clip-path 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+/* Entrance Animations */
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal-item {
+  opacity: 0;
+  animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
 
 .slanted-card:hover {
   clip-path: polygon(0 5%, 100% 0, 100% 95%, 0 100%);
