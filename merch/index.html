@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosplayers Oficiales | Blue Lock Fan Event</title>
+    <title>Merch Oficial | Blue Lock Fan Event</title>
     <link rel="stylesheet" href="/style.css">
     <style>
         .page-header { margin-top: 150px; position: relative; }
-        .page-header-line { position: absolute; top: 0; left: -10px; width: 4px; height: 100%; background: var(--accent-cyan); }
+        .page-header-line { position: absolute; top: 0; left: -10px; width: 4px; height: 100%; background: var(--accent-blue); }
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
             margin-top: 60px;
             margin-bottom: 100px;
         }
         .cosplayer-card {
             background: var(--bg-card);
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border);
             transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -25,21 +25,17 @@
         }
         .cosplayer-img {
             width: 100%;
-            height: 450px;
+            height: 350px;
             object-fit: cover;
-            filter: grayscale(0.5);
             transition: 0.5s;
         }
         .cosplayer-card:hover {
-            transform: translateY(-15px);
-            border-color: var(--accent-cyan);
-            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
-        }
-        .cosplayer-card:hover .cosplayer-img {
-            filter: grayscale(0);
+            transform: translateY(-10px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 10px 30px rgba(0, 136, 255, 0.2);
         }
         .cosplayer-info {
-            padding: 30px;
+            padding: 20px;
         }
     </style>
 </head>
@@ -48,18 +44,17 @@
         <div class="reveal-item delay-2 page-header">
             <div class="page-header-line"></div>
             <div style="font-family: var(--font-header); font-size: 0.8rem; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 10px;">
-                DATABASE / SYSTEM / COSPLAYERS
+                DATABASE / SYSTEM / MERCH
             </div>
             <h1 style="font-size: 5rem; line-height: 0.8; font-family: var(--font-header); margin-bottom: 20px;">
-                COSPLAYERS <br> <span class="highlight-cyan">OFICIALES</span>
+                MERCH <br> <span class="highlight-blue">OFICIAL</span>
             </h1>
             <p style="color: #fff; font-size: 1.1rem; max-width: 500px; opacity: 0.8;">
-                Visualiza los perfiles oficiales del <span class="highlight-blue">Egoist Tour</span>. 
-                Sincronización de sistema completada.
+                Equípate para sobrevivir a Blue Lock con nuestros artículos exclusivos del tour.
             </p>
         </div>
 
-        <div id="content-grid" class="grid-container" data-type="cosplayers">
+        <div id="content-grid" class="grid-container" data-type="merch">
             <!-- Cards will be injected here via page-init.js -->
         </div>
     </div>

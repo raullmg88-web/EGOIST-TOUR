@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horarios | Blue Lock Fan Event</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .page-header { margin-top: 150px; position: relative; }
+        .page-header-line { position: absolute; top: 0; left: -10px; width: 4px; height: 100%; background: var(--accent-cyan); }
+    </style>
+</head>
+<body class="egoist-grid">
+    <div class="container" style="position: relative; z-index: 2; min-height: 80vh;">
+        <div class="reveal-item delay-2 page-header">
+            <div class="page-header-line"></div>
+            <div style="font-family: var(--font-header); font-size: 0.8rem; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 10px;">
+                DATABASE / SYSTEM / HORARIOS
+            </div>
+            <h1 style="font-size: 5rem; line-height: 0.8; font-family: var(--font-header); margin-bottom: 20px;">
+                HORARIOS <br> <span class="highlight-cyan">DEL EVENTO</span>
+            </h1>
+            <p style="color: #fff; font-size: 1.1rem; max-width: 500px; opacity: 0.8; margin-bottom: 50px;">
+                Consulta la planificación y no te pierdas ninguna de las actividades programadas.
+            </p>
+        </div>
+
+        <div class="schedules-grid reveal-item delay-3" style="margin-bottom: 100px;">
+            <div class="day-card">
+                <h3>11 Diciembre</h3>
+                <div class="pass">
+                    <span class="highlight-cyan">Único Pase</span>
+                    <span class="time">16:30 – 19:30/20:00</span>
+                </div>
+                <ul class="activity-list" style="margin-top: 20px;">
+                    <li><span>16:30 - Apertura de puertas</span></li>
+                    <li><span>17:00 - Photocall con Cosplayers</span></li>
+                    <li><span>18:30 - Minijuegos y concursos</span></li>
+                </ul>
+            </div>
+            <div class="day-card">
+                <h3>12 Diciembre</h3>
+                <div class="pass">
+                    <span class="highlight-cyan">Primer Pase</span>
+                    <span class="time">10:00 – 13:30/14:00</span>
+                </div>
+                <div class="pass">
+                    <span class="highlight-cyan">Segundo Pase</span>
+                    <span class="time">16:30 – 19:30/20:00</span>
+                </div>
+            </div>
+            <div class="day-card">
+                <h3>13 Diciembre</h3>
+                <div class="pass">
+                    <span class="highlight-cyan">Único Pase</span>
+                    <span class="time">11:00 – 15:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/page-init.js"></script>
+</body>
+</html>
