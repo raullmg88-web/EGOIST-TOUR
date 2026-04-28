@@ -22,10 +22,10 @@ export async function loadModule(moduleName) {
             await renderGenericTable(moduleName);
             break;
         case 'horarios':
-            moduleContent.innerHTML = '<p>Módulo de horarios en construcción.</p>';
+            await renderGenericTable(moduleName);
             break;
-        case 'home':
-            moduleContent.innerHTML = '<p>Módulo de edición de Home en construcción.</p>';
+        case 'home_content':
+            await renderHomeModule();
             break;
         default:
             moduleContent.innerHTML = '<p>Módulo no encontrado.</p>';
@@ -67,8 +67,8 @@ async function renderGenericTable(tableName) {
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Imagen</th>
-                        <th>Nombre</th>
+                        ${tableName !== 'horarios' ? '<th>Imagen</th>' : '<th>Día/Hora</th>'}
+                        <th>${tableName === 'horarios' ? 'Título' : 'Nombre'}</th>
                         <th>Estado</th>
                         <th>Orden</th>
                         <th>Acciones</th>
@@ -78,12 +78,13 @@ async function renderGenericTable(tableName) {
                     ${data.length === 0 ? '<tr><td colspan="5" style="text-align:center;">No hay registros.</td></tr>' : ''}
                     ${data.map(row => `
                         <tr>
+                            ${tableName !== 'horarios' ? `
                             <td style="width: 80px;">
                                 ${row.image_url 
-                                    ? `<img src="${row.image_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` 
+                                    ? \`<img src="\${row.image_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">\` 
                                     : '<div style="width: 50px; height: 50px; background: var(--bg-dark); border-radius: 4px;"></div>'}
-                            </td>
-                            <td><strong>${row.name}</strong></td>
+                            </td>` : `<td>\${row.day}<br><small>\${row.start_time} - \${row.end_time || ''}</small></td>`}
+                            <td><strong>${row.title || row.name}</strong></td>
                             <td>
                                 ${row.is_visible 
                                     ? '<span class="badge success">Público</span>' 
@@ -158,22 +159,34 @@ function openFormModal(tableName, record = null) {
                 </div>
             </div>
         `;
+    } else if (tableName === 'horarios') {
+        extraFields = `
+            <div class="form-row">
+                <div class="form-group"><label>Día *</label><input type="text" id="f-day" required value="${record?.day || ''}" placeholder="Ej: 11 Diciembre"></div>
+                <div class="form-group"><label>Hora Inicio *</label><input type="time" id="f-start_time" required value="${record?.start_time || ''}"></div>
+                <div class="form-group"><label>Hora Fin</label><input type="time" id="f-end_time" value="${record?.end_time || ''}"></div>
+            </div>
+            <div class="form-group"><label>Ubicación</label><input type="text" id="f-location" value="${record?.location || ''}"></div>
+        `;
     }
+
+    const hasImageAndSocials = tableName !== 'horarios';
 
     const html = `
         <form id="admin-form">
             <div class="form-group">
                 <label>Nombre / Título *</label>
-                <input type="text" id="f-name" required value="${record?.name || ''}">
+                <input type="text" id="f-name" required value="${record?.name || record?.title || ''}">
             </div>
             
             ${extraFields}
 
             <div class="form-group">
                 <label>Descripción Corta</label>
-                <input type="text" id="f-short_description" value="${record?.short_description || ''}">
+                <input type="text" id="f-short_description" value="${record?.short_description || record?.description || ''}">
             </div>
             
+            ${hasImageAndSocials ? `
             <div class="form-group">
                 <label>Descripción Larga (Opcional)</label>
                 <textarea id="f-long_description">${record?.long_description || ''}</textarea>
@@ -182,7 +195,7 @@ function openFormModal(tableName, record = null) {
             <div class="form-group">
                 <label>Imagen</label>
                 <input type="file" id="f-image" accept="image/*">
-                ${record?.image_url ? `<img src="${record.image_url}" class="img-preview" id="f-image-preview">` : '<img src="" class="img-preview hidden" id="f-image-preview">'}
+                ${record?.image_url ? \`<img src="\${record.image_url}" class="img-preview" id="f-image-preview">\` : '<img src="" class="img-preview hidden" id="f-image-preview">'}
             </div>
 
             <div style="margin: 20px 0; border-top: 1px solid var(--border-color); padding-top: 20px;">
@@ -196,6 +209,7 @@ function openFormModal(tableName, record = null) {
                     <div class="form-group"><label>Web URL</label><input type="url" id="s-web" value="${record?.socials?.web || ''}"></div>
                 </div>
             </div>
+            ` : ''}
 
             <div class="form-row" style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px;">
                 <div class="form-group">
@@ -209,6 +223,7 @@ function openFormModal(tableName, record = null) {
                     <label>Orden (0 primero)</label>
                     <input type="number" id="f-sort_order" value="${record?.sort_order || 0}">
                 </div>
+                ${hasImageAndSocials ? `
                 <div class="form-group">
                     <label>Destacado</label>
                     <select id="f-is_featured">
@@ -216,6 +231,7 @@ function openFormModal(tableName, record = null) {
                         <option value="true" ${record?.is_featured === true ? 'selected' : ''}>Sí</option>
                     </select>
                 </div>
+                ` : ''}
             </div>
         </form>
     `;
@@ -229,30 +245,44 @@ function openFormModal(tableName, record = null) {
             imageUrl = await uploadImage(fileInput.files[0]);
         }
 
-        const dataToSave = {
-            name: document.getElementById('f-name').value,
-            short_description: document.getElementById('f-short_description').value,
-            long_description: document.getElementById('f-long_description').value,
-            image_url: imageUrl,
-            is_visible: document.getElementById('f-is_visible').value === 'true',
-            is_featured: document.getElementById('f-is_featured').value === 'true',
-            sort_order: parseInt(document.getElementById('f-sort_order').value) || 0,
-            socials: {
-                instagram: document.getElementById('s-instagram')?.value || '',
-                twitter: document.getElementById('s-twitter')?.value || '',
-                tiktok: document.getElementById('s-tiktok')?.value || '',
-                web: document.getElementById('s-web')?.value || '',
-            }
-        };
+        let dataToSave = {};
 
-        if (tableName === 'cosplayers') dataToSave.theme = document.getElementById('f-theme').value;
-        if (tableName === 'artistas') dataToSave.specialty = document.getElementById('f-specialty').value;
-        if (tableName === 'invitados') dataToSave.role = document.getElementById('f-role').value;
-        if (tableName === 'merch') {
-            dataToSave.price = document.getElementById('f-price').value;
-            dataToSave.category = document.getElementById('f-category').value;
-            dataToSave.label = document.getElementById('f-label').value;
-            dataToSave.in_stock = document.getElementById('f-in_stock').value === 'true';
+        if (tableName === 'horarios') {
+            dataToSave = {
+                title: document.getElementById('f-name').value,
+                description: document.getElementById('f-short_description').value,
+                day: document.getElementById('f-day').value,
+                start_time: document.getElementById('f-start_time').value,
+                end_time: document.getElementById('f-end_time').value,
+                location: document.getElementById('f-location').value,
+                is_visible: document.getElementById('f-is_visible').value === 'true',
+                sort_order: parseInt(document.getElementById('f-sort_order').value) || 0,
+            };
+        } else {
+            dataToSave = {
+                name: document.getElementById('f-name').value,
+                short_description: document.getElementById('f-short_description').value,
+                long_description: document.getElementById('f-long_description').value,
+                image_url: imageUrl,
+                is_visible: document.getElementById('f-is_visible').value === 'true',
+                is_featured: document.getElementById('f-is_featured').value === 'true',
+                sort_order: parseInt(document.getElementById('f-sort_order').value) || 0,
+                socials: {
+                    instagram: document.getElementById('s-instagram')?.value || '',
+                    twitter: document.getElementById('s-twitter')?.value || '',
+                    tiktok: document.getElementById('s-tiktok')?.value || '',
+                    web: document.getElementById('s-web')?.value || '',
+                }
+            };
+            if (tableName === 'cosplayers') dataToSave.theme = document.getElementById('f-theme').value;
+            if (tableName === 'artistas') dataToSave.specialty = document.getElementById('f-specialty').value;
+            if (tableName === 'invitados') dataToSave.role = document.getElementById('f-role').value;
+            if (tableName === 'merch') {
+                dataToSave.price = document.getElementById('f-price').value;
+                dataToSave.category = document.getElementById('f-category').value;
+                dataToSave.label = document.getElementById('f-label').value;
+                dataToSave.in_stock = document.getElementById('f-in_stock').value === 'true';
+            }
         }
 
         await saveRecord(tableName, dataToSave, isEdit ? record.id : null);
@@ -269,6 +299,90 @@ function openFormModal(tableName, record = null) {
                 preview.classList.remove('hidden');
             }
             reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+}
+
+async function renderHomeModule() {
+    let data = [];
+    try {
+        data = await fetchRecords('home_content');
+    } catch (e) {
+        moduleContent.innerHTML = `<p class="error-msg">Error al cargar datos: ${e.message}</p>`;
+        return;
+    }
+
+    const record = data[0] || {}; // Take first row
+
+    const html = `
+        <div class="module-header">
+            <h2>Gestión de Contenido Home</h2>
+            <button id="btn-save-home" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+        <div style="background: var(--bg-panel); padding: 30px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <form id="home-form">
+                <h3 style="color: var(--accent-cyan); margin-bottom: 20px;">Hero Section</h3>
+                
+                <div class="form-group">
+                    <label>Título Principal</label>
+                    <input type="text" id="h-hero_title" value="${record.hero_title || ''}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Subtítulo</label>
+                    <input type="text" id="h-hero_subtitle" value="${record.hero_subtitle || ''}">
+                </div>
+
+                <div class="form-group">
+                    <label>Descripción Hero</label>
+                    <textarea id="h-hero_description">${record.hero_description || ''}</textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group"><label>Texto Botón Primario</label><input type="text" id="h-cta_primary_text" value="${record.cta_primary_text || ''}"></div>
+                    <div class="form-group"><label>Enlace Botón Primario</label><input type="text" id="h-cta_primary_link" value="${record.cta_primary_link || ''}"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group"><label>Texto Botón Secundario</label><input type="text" id="h-cta_secondary_text" value="${record.cta_secondary_text || ''}"></div>
+                    <div class="form-group"><label>Enlace Botón Secundario</label><input type="text" id="h-cta_secondary_link" value="${record.cta_secondary_link || ''}"></div>
+                </div>
+
+                <h3 style="color: var(--accent-blue); margin-top: 40px; margin-bottom: 20px;">Sección Evento</h3>
+                <div class="form-group">
+                    <label>Descripción Evento</label>
+                    <textarea id="h-event_description">${record.event_description || ''}</textarea>
+                </div>
+            </form>
+        </div>
+    `;
+
+    moduleContent.innerHTML = html;
+
+    document.getElementById('btn-save-home').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-save-home');
+        btn.innerText = 'Guardando...';
+        btn.disabled = true;
+
+        const dataToSave = {
+            hero_title: document.getElementById('h-hero_title').value,
+            hero_subtitle: document.getElementById('h-hero_subtitle').value,
+            hero_description: document.getElementById('h-hero_description').value,
+            cta_primary_text: document.getElementById('h-cta_primary_text').value,
+            cta_primary_link: document.getElementById('h-cta_primary_link').value,
+            cta_secondary_text: document.getElementById('h-cta_secondary_text').value,
+            cta_secondary_link: document.getElementById('h-cta_secondary_link').value,
+            event_description: document.getElementById('h-event_description').value
+        };
+
+        try {
+            await saveRecord('home_content', dataToSave, record.id);
+            showToast('Contenido guardado correctamente');
+        } catch (error) {
+            showToast('Error al guardar: ' + error.message, 'error');
+        } finally {
+            btn.innerText = 'Guardar Cambios';
+            btn.disabled = false;
         }
     });
 }

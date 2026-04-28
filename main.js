@@ -1,7 +1,38 @@
 import { initLayout } from './src/layout.js';
+import { supabase } from './src/supabaseClient.js';
 
 // Init layout (Header and Footer)
 initLayout();
+
+document.addEventListener('DOMContentLoaded', async () => {
+    if (supabase) {
+        const { data, error } = await supabase.from('home_content').select('*').limit(1);
+        if (!error && data && data.length > 0) {
+            const home = data[0];
+            const safeSetText = (id, text) => {
+                const el = document.getElementById(id);
+                if (el && text) el.innerText = text;
+            };
+            const safeSetHTML = (id, html) => {
+                const el = document.getElementById(id);
+                if (el && html) el.innerHTML = html;
+            };
+            
+            safeSetHTML('dyn-hero-title', home.hero_title);
+            safeSetText('dyn-hero-subtitle', home.hero_subtitle);
+            safeSetText('dyn-hero-desc', home.hero_description);
+            safeSetText('dyn-cta-primary', home.cta_primary_text);
+            safeSetText('dyn-cta-secondary', home.cta_secondary_text);
+            safeSetText('dyn-event-desc', home.event_description);
+
+            const btnPri = document.getElementById('dyn-cta-primary');
+            if (btnPri && home.cta_primary_link) btnPri.href = home.cta_primary_link;
+
+            const btnSec = document.getElementById('dyn-cta-secondary');
+            if (btnSec && home.cta_secondary_link) btnSec.href = home.cta_secondary_link;
+        }
+    }
+});
 
 // Menu Characters Data
 const characters = [

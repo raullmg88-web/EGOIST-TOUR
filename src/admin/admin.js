@@ -25,10 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function checkSession() {
         if (!supabase) {
-            authError.innerText = "Modo Local: Supabase no configurado. Iniciando sesión simulada.";
-            setTimeout(() => {
-                showDashboard({ email: 'admin@local.test' });
-            }, 1000);
+            authError.innerText = "Error: Supabase no está configurado.";
             return;
         }
 
@@ -61,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             authError.innerText = '';
             
             if (!supabase) {
-                showDashboard({ email: 'admin@local.test' });
+                authError.innerText = "Error: Supabase no está configurado.";
                 return;
             }
 
