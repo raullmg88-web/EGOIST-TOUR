@@ -62,16 +62,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const emailInput = document.getElementById('email').value.trim();
+            const passwordInput = document.getElementById('password').value;
+
+            // Map custom login "kira" to a valid Supabase Auth account
+            let authEmail = emailInput;
+            let authPassword = passwordInput;
+
+            if (emailInput.toLowerCase() === 'kira' && passwordInput === 'kira') {
+                authEmail = 'kira@egoist.tour';
+                authPassword = 'kira123456';
+            }
 
             const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
+                email: authEmail,
+                password: authPassword,
             });
 
             if (error) {
-                authError.innerText = error.message;
+                authError.innerText = error.message === 'Invalid login credentials' && emailInput.toLowerCase() === 'kira' 
+                    ? 'Error: Asegúrate de haber creado el usuario kira@egoist.tour con contraseña kira123456 en Supabase.' 
+                    : error.message;
             }
         });
     }
