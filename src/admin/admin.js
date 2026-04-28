@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        // Fake login check (Secret Code)
+        if (localStorage.getItem('admin_secret_auth') === 'kira') {
+            showDashboard({ email: 'Administrador' });
+            return;
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
             showDashboard(session.user);
@@ -62,27 +68,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            const emailInput = document.getElementById('email').value.trim();
-            const passwordInput = document.getElementById('password').value;
+            const secretCode = document.getElementById('secret_code').value.trim();
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
 
-            // Map custom login "kira" to a valid Supabase Auth account
-            let authEmail = emailInput;
-            let authPassword = passwordInput;
-
-            if (emailInput.toLowerCase() === 'kira' && passwordInput === 'kira') {
-                authEmail = 'kira@egoist.tour';
-                authPassword = 'kira123456';
-            }
-
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: authEmail,
-                password: authPassword,
-            });
-
-            if (error) {
-                authError.innerText = error.message === 'Invalid login credentials' && emailInput.toLowerCase() === 'kira' 
-                    ? 'Error: Asegúrate de haber creado el usuario kira@egoist.tour con contraseña kira123456 en Supabase.' 
-                    : error.message;
+            if (secretCode.toLowerCase() === 'kira') {
+                localStorage.setItem('admin_secret_auth', 'kira');
+                showDashboard({ email: 'Administrador' });
+                return;
+            } else {
+                authError.innerText = "Código secreto incorrecto.";
             }
         });
     }
@@ -90,11 +84,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
+            localStorage.removeItem('admin_secret_auth');
             if (supabase) {
                 await supabase.auth.signOut();
-            } else {
-                showLogin();
             }
+            showLogin();
         });
     }
 
