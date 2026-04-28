@@ -81,9 +81,9 @@ async function renderGenericTable(tableName) {
                             ${tableName !== 'horarios' ? `
                             <td style="width: 80px;">
                                 ${row.image_url 
-                                    ? \`<img src="\${row.image_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">\` 
+                                    ? '<img src="' + row.image_url + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">'
                                     : '<div style="width: 50px; height: 50px; background: var(--bg-dark); border-radius: 4px;"></div>'}
-                            </td>` : `<td>\${row.day}<br><small>\${row.start_time} - \${row.end_time || ''}</small></td>`}
+                            </td>` : `<td>${row.day || ''}<br><small>${row.start_time || ''} - ${row.end_time || ''}</small></td>`}
                             <td><strong>${row.title || row.name}</strong></td>
                             <td>
                                 ${row.is_visible 
@@ -195,7 +195,7 @@ function openFormModal(tableName, record = null) {
             <div class="form-group">
                 <label>Imagen</label>
                 <input type="file" id="f-image" accept="image/*">
-                ${record?.image_url ? \`<img src="\${record.image_url}" class="img-preview" id="f-image-preview">\` : '<img src="" class="img-preview hidden" id="f-image-preview">'}
+                ${record?.image_url ? '<img src="' + record.image_url + '" class="img-preview" id="f-image-preview">' : '<img src="" class="img-preview hidden" id="f-image-preview">'}
             </div>
 
             <div style="margin: 20px 0; border-top: 1px solid var(--border-color); padding-top: 20px;">
